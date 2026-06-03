@@ -3,7 +3,7 @@ from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
 import google.generativeai as genai
 
-# الإعدادات: يتم جلبها تلقائياً من Railway
+# الإعدادات
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 model = genai.GenerativeModel('gemini-1.5-flash')
 TOKEN = os.getenv('TOKEN')
@@ -36,18 +36,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             response = model.generate_content(text)
             await update.message.reply_text(response.text, reply_markup=ReplyKeyboardMarkup([["رجوع 🔙"]], resize_keyboard=True))
-        except Exception as e:
+        except:
             await update.message.reply_text("حدث خطأ في الاتصال، حاول مرة أخرى.")
     
     else:
         await update.message.reply_text("اختر قسماً من القائمة:", reply_markup=ReplyKeyboardMarkup([["رجوع 🔙"]], resize_keyboard=True))
 
 if __name__ == '__main__':
-    if not TOKEN:
-        print("خطأ: لم يتم العثور على التوكن في الإعدادات!")
-    else:
-        app = ApplicationBuilder().token(TOKEN).build()
-        app.add_handler(CommandHandler("start", start))
-        app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
-        print("البوت يعمل!")
-        app.run_polling()
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
+    print("البوت يعمل!")
+    app.run_polling()

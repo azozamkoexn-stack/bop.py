@@ -4,7 +4,7 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Messa
 import google.generativeai as genai
 
 # تم تعديل هذا السطر ليطابق اسم المتغير تماماً كما هو في Railway
-genai.configure(api_key=os.getenv('Gemini API Key 3'))
+genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 model = genai.GenerativeModel('gemini-1.5-flash')
 TOKEN = os.getenv('TOKEN')
 

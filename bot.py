@@ -3,7 +3,7 @@ from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
 import google.generativeai as genai
 
-# تم تعديل هذا السطر ليطابق اسم المتغير تماماً كما هو في Railway
+# إعدادات الاتصال
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 model = genai.GenerativeModel('gemini-1.5-flash')
 TOKEN = os.getenv('TOKEN')
@@ -29,13 +29,26 @@ async def get_count(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_user(update.message.from_user.id)
-    keyboard = [["المساعد الذكي 🤖"], ["قسم FiveM 🚗", "قسم تقنية المعلومات 🖥️"], ["حساباتي 📱"]]
+    
+    # قراءة العدد الحالي لعرضه في الزر
+    count = 0
+    if os.path.exists("users.txt"):
+        with open("users.txt", "r") as f:
+            count = len(f.read().splitlines())
+    
+    # الكيبورد مع إضافة زر العدد في الأعلى
+    keyboard = [
+        [f"عدد الأعضاء: {count} 👥"],
+        ["المساعد الذكي 🤖"], 
+        ["قسم FiveM 🚗", "قسم تقنية المعلومات 🖥️"], 
+        ["حساباتي 📱"]
+    ]
     await update.message.reply_text("أهلاً عزوز! اختر قسماً:", reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
     
-    if text == "/start" or text == "رجوع 🔙":
+    if text == "/start" or text == "رجوع 🔙" or text.startswith("عدد الأعضاء"):
         context.user_data['chatting'] = False
         await start(update, context)
         return
